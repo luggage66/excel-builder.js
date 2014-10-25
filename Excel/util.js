@@ -1,12 +1,14 @@
+if (typeof define !== 'function') { var define = require('amdefine')(module) }
+    
 /**
  * @module Excel/util
  */
 define(['./XMLDOM'], function (XMLDOM) {
     "use strict";
     var util = {
-        
+
         _idSpaces: {},
-        
+
         /**
          * Returns a number based on a namespace. So, running with 'Picture' will return 1. Run again, you will get 2. Run with 'Foo', you'll get 1.
          * @param {String} space
@@ -18,14 +20,14 @@ define(['./XMLDOM'], function (XMLDOM) {
             }
             return this._idSpaces[space]++;
         },
-        
+
         /**
-         * Attempts to create an XML document. Due to limitations in web workers, 
-         * it may return a 'fake' xml document created from the XMLDOM.js file. 
-         * 
+         * Attempts to create an XML document. Due to limitations in web workers,
+         * it may return a 'fake' xml document created from the XMLDOM.js file.
+         *
          * Takes a namespace to start the xml file in, as well as the root element
-         * of the xml file. 
-         * 
+         * of the xml file.
+         *
          * @param {type} ns
          * @param {type} base
          * @returns {ActiveXObject|@exp;document@pro;implementation@call;createDocument|@new;XMLDOM}
@@ -45,11 +47,11 @@ define(['./XMLDOM'], function (XMLDOM) {
             }
             throw "No xml document generator";
         },
-        
+
         /**
          * Creates an xml node (element). Used to simplify some calls, as IE is
-         * very particular about namespaces and such. 
-         * 
+         * very particular about namespaces and such.
+         *
          * @param {XMLDOM} doc An xml document (actual DOM or fake DOM, not a string)
          * @param {type} name The name of the element
          * @param {type} attributes
@@ -69,9 +71,9 @@ define(['./XMLDOM'], function (XMLDOM) {
             }
             return el;
         },
-        
+
         LETTER_REFS: {},
-	
+
         positionToLetterRef: function (x, y) {
             var digit = 1, index, num = x, string = "", alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             if(this.LETTER_REFS[x]) {
@@ -88,7 +90,7 @@ define(['./XMLDOM'], function (XMLDOM) {
             this.LETTER_REFS[x] = string;
             return string.concat(y);
         },
-		
+
         schemas: {
             'worksheet': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet',
             'sharedStrings': "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings",
@@ -109,6 +111,6 @@ define(['./XMLDOM'], function (XMLDOM) {
             'chart': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart'
         }
     };
-	
+
     return util;
 });

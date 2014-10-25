@@ -1,3 +1,5 @@
+if (typeof define !== 'function') { var define = require('amdefine')(module) }
+    
 /**
  * @module Excel/Drawings
  */
@@ -8,11 +10,11 @@ define(['underscore', './RelationshipManager', './util'], function (_, Relations
         this.relations = new RelationshipManager();
         this.id = _.uniqueId('Drawings');
     };
-    
+
     _.extend(Drawings.prototype, {
         /**
          * Adds a drawing (more likely a subclass of a Drawing) to the 'Drawings' for a particular worksheet.
-         * 
+         *
          * @param {Drawing} drawing
          * @returns {undefined}
          */
@@ -27,9 +29,9 @@ define(['underscore', './RelationshipManager', './util'], function (_, Relations
             var drawings = doc.documentElement;
 //            drawings.setAttribute('xmlns:xdr', util.schemas.spreadsheetDrawing);
             drawings.setAttribute('xmlns:a', util.schemas.drawing);
-            
+
             for(var i = 0, l = this.drawings.length; i < l; i++) {
-                
+
                 var rId = this.relations.getRelationshipId(this.drawings[i].getMediaData());
                 if(!rId) {
                     rId = this.relations.addRelation(this.drawings[i].getMediaData(), this.drawings[i].getMediaType()); //chart
@@ -40,6 +42,6 @@ define(['underscore', './RelationshipManager', './util'], function (_, Relations
             return doc;
         }
     });
-    
+
     return Drawings;
 });

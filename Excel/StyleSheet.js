@@ -1,3 +1,5 @@
+if (typeof define !== 'function') { var define = require('amdefine')(module) }
+
 /**
  * @module Excel/StyleSheet
  */
@@ -6,31 +8,31 @@ define(['underscore', './util'], function (_, util) {
     var StyleSheet = function () {
         this.id = _.uniqueId('StyleSheet');
         this.cellStyles = [{
-            name:"Normal", 
-            xfId:"0", 
+            name:"Normal",
+            xfId:"0",
             builtinId:"0"
         }];
         this.defaultTableStyle = false;
         this.differentialStyles = [{}];
         this.masterCellFormats = [{
-            numFmtId: 0, 
-            fontId: 0, 
-            fillId: 0, 
-            borderId: 0, 
+            numFmtId: 0,
+            fontId: 0,
+            fillId: 0,
+            borderId: 0,
             xfid: 0
         }];
         this.masterCellStyles = [{
-            numFmtId: 0, 
-            fontId: 0, 
-            fillId: 0, 
+            numFmtId: 0,
+            fontId: 0,
+            fillId: 0,
             borderId: 0
         }];
         this.fonts = [{}];
         this.numberFormatters = [];
         this.fills = [{}, {
-            type: 'pattern', 
-            patternType: 'gray125', 
-            fgColor: 'FF333333', 
+            type: 'pattern',
+            patternType: 'gray125',
+            fgColor: 'FF333333',
             bgColor: 'FF333333'
         }];
         this.borders = [{
@@ -139,7 +141,7 @@ define(['underscore', './util'], function (_, util) {
             this.masterCellFormats.push(style);
             return style;
         },
-        
+
         createDifferentialStyle: function (styleInstructions) {
             var id = this.differentialStyles.length;
             var style = {
@@ -169,18 +171,18 @@ define(['underscore', './util'], function (_, util) {
             this.differentialStyles[id] = style;
             return style;
         },
-        
+
         /**
          * Should be an object containing keys that match with one of the keys from this list:
          * http://www.schemacentral.com/sc/ooxml/t-ssml_ST_TableStyleType.html
-         * 
+         *
          * The value should be a reference to a differential format (dxf)
          * @param {Object} instructions
          */
         createTableStyle: function (instructions) {
             this.tableStyles.push(instructions);
         },
-        
+
         /**
         * All params optional
         * Expects: {
@@ -283,7 +285,7 @@ define(['underscore', './util'], function (_, util) {
         exportBorders: function (doc) {
             var borders = doc.createElement('borders');
             borders.setAttribute('count', this.borders.length);
-            
+
             for(var i = 0, l = this.borders.length; i < l; i++) {
                 borders.appendChild(this.exportBorder(doc, this.borders[i]));
             }
@@ -318,13 +320,13 @@ define(['underscore', './util'], function (_, util) {
                 return colorEl;
             }
 
-            if (!_.isUndefined(color.tint)) { 
+            if (!_.isUndefined(color.tint)) {
                 colorEl.setAttribute('tint', color.tint);
             }
-            if (!_.isUndefined(color.auto)) { 
+            if (!_.isUndefined(color.auto)) {
                 colorEl.setAttribute('auto', !!color.auto);
             }
-            if (!_.isUndefined(color.theme)) { 
+            if (!_.isUndefined(color.theme)) {
                 colorEl.setAttribute('theme', color.theme);
             }
 
@@ -355,7 +357,7 @@ define(['underscore', './util'], function (_, util) {
 
         exportCellFormatElement: function (doc, styleInstructions) {
             var xf = doc.createElement('xf');
-            var allowed = ['applyAlignment', 'applyBorder', 'applyFill', 'applyFont', 'applyNumberFormat', 
+            var allowed = ['applyAlignment', 'applyBorder', 'applyFill', 'applyFont', 'applyNumberFormat',
             'applyProtection', 'borderId', 'fillId', 'fontId', 'numFmtId', 'pivotButton', 'quotePrefix', 'xfId'];
             var attributes = _.filter(_.keys(styleInstructions), function (key) {
                 if(_.indexOf(allowed, key) !== -1) {
@@ -375,7 +377,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return xf;
         },
-        
+
         exportAlignment: function (doc, alignmentData) {
             var alignment = doc.createElement('alignment');
             var keys = _.keys(alignmentData);
@@ -384,7 +386,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return alignment;
         },
-        
+
         exportFonts: function (doc) {
             var fonts = doc.createElement('fonts');
             fonts.setAttribute('count', this.fonts.length);
@@ -394,7 +396,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return fonts;
         },
-        
+
         exportFont: function (doc, fd) {
             var font = doc.createElement('font');
             if(fd.size) {
@@ -420,12 +422,12 @@ define(['underscore', './util'], function (_, util) {
                 vertAlign.setAttribute('val', fd.vertAlign);
                 font.appendChild(vertAlign);
             }
-            if(fd.underline) { 
+            if(fd.underline) {
                 var u = doc.createElement('u');
                 if(fd.underline !== true) {
                     u.setAttribute('val', fd.underline);
                 }
-                font.appendChild(u); 
+                font.appendChild(u);
             }
             if(fd.strike) {
                 font.appendChild(doc.createElement('strike'));
@@ -451,7 +453,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return fills;
         },
-        
+
         exportFill: function (doc, fd) {
             var fillDef;
             var fill = doc.createElement('fill');
@@ -464,7 +466,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return fill;
         },
-        
+
         exportGradientFill: function (doc, data) {
             var fillDef = doc.createElement('gradientFill');
             if(data.degree) {
@@ -483,7 +485,7 @@ define(['underscore', './util'], function (_, util) {
             } else if (typeof data.start.theme) {
                 startColor.setAttribute('theme', data.start.theme);
             }
-            
+
             var end = doc.createElement('stop');
             var endColor = doc.createElement('color');
             end.setAttribute('position', data.end.pureAt || 1);
@@ -498,7 +500,7 @@ define(['underscore', './util'], function (_, util) {
             fillDef.appendChild(end);
             return fillDef;
         },
-        
+
         /**
         * Pattern types: http://www.schemacentral.com/sc/ooxml/t-ssml_ST_PatternType.html
         * @param {XMLDoc} doc
@@ -550,7 +552,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return formatters;
         },
-        
+
         exportNumberFormatter: function (doc, fd) {
             var numFmt = doc.createElement('numFmt');
             numFmt.setAttribute('numFmtId', fd.id);
@@ -588,7 +590,7 @@ define(['underscore', './util'], function (_, util) {
 
             return dxfs;
         },
-        
+
         exportDFX: function (doc, style) {
             var dxf = doc.createElement('dxf');
             if(style.font) {
@@ -608,7 +610,7 @@ define(['underscore', './util'], function (_, util) {
             }
             return dxf;
         },
-        
+
         exportTableStyles: function (doc) {
             var tableStyles = doc.createElement('tableStyles');
             tableStyles.setAttribute('count', this.tableStyles.length);
@@ -620,13 +622,13 @@ define(['underscore', './util'], function (_, util) {
             }
             return tableStyles;
         },
-        
+
         exportTableStyle: function (doc, style) {
             var tableStyle = doc.createElement('tableStyle');
             tableStyle.setAttribute('name', style.name);
             tableStyle.setAttribute('pivot', 0);
             var i = 0;
-            
+
             _.each(style, function (value, key) {
                 if(key === 'name') {return;}
                 i++;
@@ -638,7 +640,7 @@ define(['underscore', './util'], function (_, util) {
             tableStyle.setAttribute('count', i);
             return tableStyle;
         },
-        
+
         toXML: function () {
             var doc = util.createXmlDoc(util.schemas.spreadsheetml, 'styleSheet');
             var styleSheet = doc.documentElement;

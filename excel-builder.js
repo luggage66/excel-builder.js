@@ -1,10 +1,12 @@
+if (typeof define !== 'function') { var define = require('amdefine')(module) }
+
 define([
     'require',
     'underscore',
     './Excel/Workbook',
     'JSZip'
 ], function (require, _, Workbook, JSZip) {
-    
+
     /**
      * @name Excel
      * @public
@@ -21,9 +23,9 @@ define([
         createWorkbook: function () {
             return new Workbook();
         },
-        
+
         /**
-         * Turns a workbook into a downloadable file. 
+         * Turns a workbook into a downloadable file.
          * @param {Excel/Workbook} workbook The workbook that is being converted
          * @param {Object} options
          * @param {Boolean} options.base64 Whether to 'return' the generated file as a base64 string
@@ -32,11 +34,11 @@ define([
          * @param {String} options.requireJsPath (Optional) The path to requirejs. Will use the id 'requirejs' to look up the script if not specified.
          */
         createFileAsync: function (workbook, options) {
-            
-            
+
+
             workbook.generateFilesAsync({
                 success: function (files) {
-                    
+
                     var worker = new Worker(require.toUrl('./Excel/ZipWorker.js'));
                     worker.addEventListener('message', function(event, data) {
                         if(event.data.status == 'done') {
@@ -54,7 +56,7 @@ define([
                 }
             });
         },
-        
+
         /**
          * Turns a workbook into a downloadable file.
          * @param {Excel/Workbook} workbook The workbook that is being converted
@@ -76,7 +78,7 @@ define([
             }));
         }
     }
-    
-    
+
+
     return Factory;
 });

@@ -1,7 +1,9 @@
+if (typeof define !== 'function') { var define = require('amdefine')(module) }
+
 /**
- * This module represents an excel worksheet in its basic form - no tables, charts, etc. Its purpose is 
+ * This module represents an excel worksheet in its basic form - no tables, charts, etc. Its purpose is
  * to hold data, the data's link to how it should be styled, and any links to other outside resources.
- * 
+ *
  * @module Excel/Worksheet
  */
 define(['underscore', './util', './RelationshipManager'], function (_, util, RelationshipManager) {
@@ -22,7 +24,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
         this.initialize(config);
     };
     _.extend(Worksheet.prototype, {
-        
+
         initialize: function (config) {
             config = config || {};
             this.name = config.name;
@@ -31,10 +33,10 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             if(config.columns) {
                 this.setColumns(config.columns);
             }
-            
+
             this.relations = new RelationshipManager();
         },
-        
+
         /**
          * Returns an object that can be consumed by a WorksheetExportWorker
          * @returns {Object}
@@ -53,7 +55,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 id: this.id
             };
         },
-        
+
         /**
          * Imports data - to be used while inside of a WorksheetExportWorker.
          * @param {Object} data
@@ -63,27 +65,27 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             delete data.relations;
             _.extend(this, data);
         },
-        
+
     setSharedStringCollection: function (stringCollection) {
             this.sharedStrings = stringCollection;
         },
-        
+
         addTable: function (table) {
             this._tables.push(table);
             this.relations.addRelation(table, 'table');
         },
-                
+
         addDrawings: function (table) {
             this._drawings.push(table);
             this.relations.addRelation(table, 'drawingRelationship');
         },
-        
+
         /**
         * Expects an array length of three.
-        * 
-        * @see Excel/Worksheet compilePageDetailPiece 
+        *
+        * @see Excel/Worksheet compilePageDetailPiece
         * @see <a href='/cookbook/addingHeadersAndFooters.html'>Adding headers and footers to a worksheet</a>
-        * 
+        *
         * @param {Array} headers [left, center, right]
         */
         setHeader: function (headers) {
@@ -92,13 +94,13 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             }
             this._headers = headers;
         },
-        
+
         /**
         * Expects an array length of three.
-        * 
-        * @see Excel/Worksheet compilePageDetailPiece 
+        *
+        * @see Excel/Worksheet compilePageDetailPiece
         * @see <a href='/cookbook/addingHeadersAndFooters.html'>Adding headers and footers to a worksheet</a>
-        * 
+        *
         * @param {Array} footers [left, center, right]
         */
         setFooter: function (footers) {
@@ -107,7 +109,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             }
             this._footers = footers;
         },
-        
+
         /**
          * Turns page header/footer details into the proper format for Excel.
          * @param {type} data
@@ -121,11 +123,11 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             "&R", this.compilePageDetailPiece(data[2] || "")
             ].join('');
         },
-    
+
         /**
          * Turns instructions on page header/footer details into something
          * usable by Excel.
-         * 
+         *
          * @param {type} data
          * @returns {String|@exp;_@call;reduce}
          */
@@ -133,7 +135,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             if(_.isString(data)) {
                 return '&"-,Regular"'.concat(data);
             }
-            if(_.isObject(data) && !_.isArray(data)) { 
+            if(_.isObject(data) && !_.isArray(data)) {
                 var string = "";
                 if(data.font || data.bold) {
                     var weighting = data.bold ? "Bold" : "Regular";
@@ -149,10 +151,10 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                     string += "&"+data.fontSize;
                 }
                 string += data.text;
-                
+
                 return string;
             }
-            
+
             if(_.isArray(data)) {
                 var self = this;
                 return _.reduce(data, function (m, v) {
@@ -160,10 +162,10 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 }, "");
             }
         },
-        
+
         /**
-         * Creates the header node. 
-         * 
+         * Creates the header node.
+         *
          * @todo implement the ability to do even/odd headers
          * @param {XML Doc} doc
          * @returns {XML Node}
@@ -173,25 +175,25 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             oddHeader.appendChild(doc.createTextNode(this.compilePageDetailPackage(this._headers)));
             return oddHeader;
         },
-    
+
         /**
          * Creates the footer node.
-         * 
+         *
          * @todo implement the ability to do even/odd footers
          * @param {XML Doc} doc
          * @returns {XML Node}
-         */    
+         */
         exportFooter: function (doc) {
             var oddFooter = doc.createElement('oddFooter');
             oddFooter.appendChild(doc.createTextNode(this.compilePageDetailPackage(this._footers)));
             return oddFooter;
         },
-        
+
         /**
-         * This creates some nodes ahead of time, which cuts down on generation time due to 
+         * This creates some nodes ahead of time, which cuts down on generation time due to
          * most cell definitions being essentially the same, but having multiple nodes that need
          * to be created. Cloning takes less time than creation.
-         * 
+         *
          * @private
          * @param {XML Doc} doc
          * @returns {_L8.Anonym$0._buildCache.Anonym$2}
@@ -201,19 +203,19 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             var value = doc.createElement('v');
             value.appendChild(doc.createTextNode("--temp--"));
             numberNode.appendChild(value);
-            
+
             var formulaNode = doc.createElement('c');
             var formulaValue = doc.createElement('f');
             formulaValue.appendChild(doc.createTextNode("--temp--"));
             formulaNode.appendChild(formulaValue);
-            
+
             var stringNode = doc.createElement('c');
             stringNode.setAttribute('t', 's');
             var stringValue = doc.createElement('v');
             stringValue.appendChild(doc.createTextNode("--temp--"));
             stringNode.appendChild(stringValue);
-            
-            
+
+
             return {
                 number: numberNode,
                 date: numberNode,
@@ -221,11 +223,11 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 formula: formulaNode
             };
         },
-        
+
         /**
          * Runs through the XML document and grabs all of the strings that will
-         * be sent to the 'shared strings' document. 
-         * 
+         * be sent to the 'shared strings' document.
+         *
          * @returns {Array}
          */
         collectSharedStrings: function () {
@@ -242,7 +244,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                     if (cellValue && typeof cellValue === 'object') {
                         cellValue = cellValue.value;
                     }
-                    
+
                     if(!metadata.type) {
                         if(typeof cellValue === 'number') {
                             metadata.type = 'number';
@@ -257,7 +259,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             }
             return _.keys(strings);
         },
-        
+
         toXML: function () {
             var data = this.data;
             var columns = this.columns || [];
@@ -266,18 +268,18 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             var i, l, row;
             worksheet.setAttribute('xmlns:r', util.schemas.relationships);
             worksheet.setAttribute('xmlns:mc', util.schemas.markupCompat);
-            
+
             var maxX = 0;
             var sheetData = util.createElement(doc, 'sheetData');
-            
+
             var cellCache = this._buildCache(doc);
-            
+
             for(row = 0, l = data.length; row < l; row++) {
                 var dataRow = data[row];
                 var cellCount = dataRow.length;
                 maxX = cellCount > maxX ? cellCount : maxX;
                 var rowNode = doc.createElement('row');
-                
+
                 for(var c = 0; c < cellCount; c++) {
                     columns[c] = columns[c] || {};
                     var cellValue = dataRow[c];
@@ -286,7 +288,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                     if (cellValue && typeof cellValue === 'object') {
                         cellValue = cellValue.value;
                     }
-            
+
                     if(!metadata.type) {
                         if(typeof cellValue === 'number') {
                             metadata.type = 'number';
@@ -327,8 +329,8 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 }
                 rowNode.setAttribute('r', row + 1);
                 sheetData.appendChild(rowNode);
-            } 
-            
+            }
+
             if(maxX !== 0) {
                 worksheet.appendChild(util.createElement(doc, 'dimension', [
                     ['ref',  util.positionToLetterRef(1, 1) + ':' + util.positionToLetterRef(maxX, data.length)]
@@ -338,7 +340,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                     ['ref',  util.positionToLetterRef(1, 1)]
                 ]));
             }
-            
+
             if(this.columns.length) {
                 worksheet.appendChild(this.exportColumns(doc));
             }
@@ -355,9 +357,9 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 }
                 worksheet.appendChild(mergeCells);
             }
-            
+
             this.exportPageSettings(doc, worksheet);
-            
+
             if(this._headers.length > 0 || this._footers.length > 0) {
                 var headerFooter = doc.createElement('headerFooter');
                 if(this._headers.length > 0) {
@@ -368,7 +370,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 }
                 worksheet.appendChild(headerFooter);
             }
-            
+
             if(this._tables.length > 0) {
                 var tables = doc.createElement('tableParts');
                 tables.setAttribute('count', this._tables.length);
@@ -389,9 +391,9 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
             }
             return doc;
         },
-        
+
         /**
-         * 
+         *
          * @param {XML Doc} doc
          * @returns {XML Node}
          */
@@ -417,52 +419,52 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
                 } else {
                     col.setAttribute('width', 9.140625);
                 }
-                
+
                 cols.appendChild(col);
             }
             return cols;
         },
-        
+
         /**
          * Sets the page settings on a worksheet node.
-         * 
+         *
          * @param {XML Doc} doc
          * @param {XML Node} worksheet
          * @returns {undefined}
          */
         exportPageSettings: function (doc, worksheet) {
-            
+
             if(this._orientation) {
                 worksheet.appendChild(util.createElement(doc, 'pageSetup', [
                     ['orientation', this._orientation]
                 ]));
             }
         },
-    
+
         /**
          * http://www.schemacentral.com/sc/ooxml/t-ssml_ST_Orientation.html
-         * 
+         *
          * Can be one of 'portrait' or 'landscape'.
-         * 
+         *
          * @param {String} orientation
          * @returns {undefined}
          */
         setPageOrientation: function (orientation) {
             this._orientation = orientation;
         },
-        
+
         /**
-         * Expects an array of column definitions. Each column definition needs to have a width assigned to it. 
-         * 
+         * Expects an array of column definitions. Each column definition needs to have a width assigned to it.
+         *
          * @param {Array} columns
          */
         setColumns: function (columns) {
             this.columns = columns;
         },
-        
+
         /**
-         * Expects an array of data to be translated into cells. 
-         * 
+         * Expects an array of data to be translated into cells.
+         *
          * @param {Array} data Two dimensional array - [ [A1, A2], [B1, B2] ]
          * @see <a href='/cookbook/addingDataToAWorksheet.html'>Adding data to a worksheet</a>
          */
@@ -479,7 +481,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
         mergeCells: function(cell1, cell2) {
             this.mergedCells.push([cell1, cell2]);
         },
-        
+
         /**
          * Expects an array containing an object full of column format definitions.
          * http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.column.aspx
@@ -489,7 +491,7 @@ define(['underscore', './util', './RelationshipManager'], function (_, util, Rel
          * hidden
          * max
          * min
-         * outlineLevel 
+         * outlineLevel
          * phonetic
          * style
          * width
